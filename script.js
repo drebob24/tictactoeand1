@@ -1,6 +1,7 @@
 const player1 = 'X';
 const player2 = 'O';
 let currentToken = player1;
+let cpuMode = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     const turnInformation = document.getElementById("sub-heading");
@@ -10,30 +11,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     squares.forEach(square => {
         square.addEventListener('click', () => {
-
-            if (!square.textContent) {
-                square.textContent = currentToken;
-                const squareGroups = square.className
-                    .replace("board-square", "")
-                    .replace("offcolor", "")
-                    .trim()
-                    .split(" ");
-                const winningGroup = checkWin(squareGroups, currentToken)
-                if (winningGroup){
-                    winningGroup.forEach(square => {
-                        square.style.backgroundColor = 'gold';
-                    })
-                    alert("You win");
-                }
-                const drawCheck = checkDraw(squares)
-                currentToken = (currentToken === player1) ? player2 : player1;
-                turnInformation.innerText = updatePlayerTurn(currentToken, player1);
-            } else {
-                alert("Square already selected.");
+            let chosenSquare = square;
+            if (chosenSquare.textContent){
+                alert("Square already selected");
+                return;
             }
+
+            chosenSquare.textContent = currentToken;
+            const squareClasses = getSquareClasses(chosenSquare.className);
+            const classNodeList = squareClasses.map(group => document.querySelectorAll(`.${group}`))
+            const winningSquares = checkWin(classNodeList, currentToken)
+            if (winningSquares){
+                highlightSquares(winningSquares)
+                alert("You win");
+                return
+            }
+            checkDraw(squares) && alert("Draw");
+            currentToken = (currentToken === player1) ? player2 : player1;
+            turnInformation.innerText = updatePlayerTurn(currentToken, player1);
+            if (currentToken === player2 && cpuMode) {
+                chosenSquare = pickSquare();
+            }
+
         })
     })
 })
+
+function getSquareClasses (classes) {
+    return classes
+        .replace("board-square", "")
+        .replace("offcolor", "")
+        .trim()
+        .split(" ");
+}
 
 function updatePlayerTurn(currentToken, player1){
     return (currentToken === player1)
@@ -41,13 +51,12 @@ function updatePlayerTurn(currentToken, player1){
     : `Player 2's Turn`;
 }
 
-function checkWin(squareGroups, token) {
-    for (let group of squareGroups) {
-        const inARow = document.querySelectorAll(`.${group}`);
-        const allMatch = Array.from(inARow)
+function checkWin(nodeList, token) {
+    for (let node of nodeList) {
+        const allMatch = Array.from(node)
             .every(square => (square.textContent === token) ? true : false);
         if (allMatch){
-            return inARow;
+            return node;
         }
     }
     return false;
@@ -59,6 +68,12 @@ function checkDraw(allSquares) {
     return allFilled
 }
 
+
+function highlightSquares(squares) {
+    squares.forEach(square => {
+        square.style.backgroundColor = 'gold';
+    })
+}
 
 
 // Wait for click
