@@ -10,20 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetButton = document.createElement('button');
     resetButton.textContent = 'Reset';
     resetButton.id = 'reset-button';
-    const playerInput = document.getElementById('player-mode');
-    const cpuInput = document.getElementById('cpu-mode');
     const modeForm = document.getElementById('mode-selection');
     let gameOver = false;
 
     turnInformation.innerText = updatePlayerTurn(currentToken, player1);
 
     modeForm.addEventListener('change', (event) => {
-        if (event.target.value === "players") {
-            cpuMode = false;
-        }
-        if (event.target.value === 'cpu') {
-            cpuMode = true;
-        }
+        cpuMode = (event.target.value === "players") ? false : true;
     })
 
     squares.forEach(square => {
@@ -38,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             gameOver = await updateGame(chosenSquare, squares, turnInformation);
             console.log(`1 ${gameOver}`)
-            if (currentToken === player2 && cpuMode && !gameOver) {
+            if (cpuMode && !gameOver) {
                 chosenSquare = await pickSquare(squares);
                 gameOver = await updateGame(chosenSquare, squares, turnInformation)
             }
