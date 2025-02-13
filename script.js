@@ -1,21 +1,33 @@
 const player1 = 'X';
 const player2 = 'O';
 let currentToken = player1;
-let cpuMode = true;
+let cpuMode = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     const turnInformation = document.getElementById("sub-heading");
     const squares = document.querySelectorAll(".board-square");
     const body = document.querySelector('body');
-    const resetButton = document.createElement('button')
+    const resetButton = document.createElement('button');
     resetButton.textContent = 'Reset';
     resetButton.id = 'reset-button';
+    const playerInput = document.getElementById('player-mode');
+    const cpuInput = document.getElementById('cpu-mode');
+    const modeForm = document.getElementById('mode-selection');
     let gameOver = false;
 
     turnInformation.innerText = updatePlayerTurn(currentToken, player1);
 
+    modeForm.addEventListener('change', (event) => {
+        if (event.target.value === "players") {
+            cpuMode = false;
+        }
+        if (event.target.value === 'cpu') {
+            cpuMode = true;
+        }
+    })
+
     squares.forEach(square => {
-        square.addEventListener('click', () => {
+        square.addEventListener('click', async function() {
             if (gameOver){
                 return;
             }
@@ -24,15 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert("Square already selected");
                 return;
             }
-            gameOver = updateGame(chosenSquare, squares, turnInformation);
-            if (currentToken === player2 && cpuMode) {
-                chosenSquare = pickSquare(squares);
-                setTimeout(() => {
-                    gameOver = updateGame(chosenSquare, squares, turnInformation)
-                    console.log(gameOver);
-                }, 500)
-                console.log(gameOver)
+            gameOver = await updateGame(chosenSquare, squares, turnInformation);
+            console.log(`1 ${gameOver}`)
+            if (currentToken === player2 && cpuMode && !gameOver) {
+                chosenSquare = await pickSquare(squares);
+                gameOver = await updateGame(chosenSquare, squares, turnInformation)
             }
+            console.log(`2 ${gameOver}`)
             if (gameOver) {
                 body.appendChild(resetButton);
                 resetButton.addEventListener('click', () => {
@@ -42,12 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     resetButton.remove();
                     gameOver = false;
                 })
+                return;
             }
 
         })
     })
 })
-
 
 function resetBoard(squares) {
     squares.forEach(square => {
@@ -58,10 +68,14 @@ function resetBoard(squares) {
 }
 
 function pickSquare(squares) {
-    const openSquareList = Array.from(squares)
-        .filter(square => !square.textContent)
-    const chosenSquare = Math.floor(Math.random() * openSquareList.length);
-    return openSquareList[chosenSquare]
+    return new Promise((resolve) => {
+        const openSquareList = Array.from(squares)
+            .filter(square => !square.textContent);
+        setTimeout(() => {
+            const chosenSquare = Math.floor(Math.random() * openSquareList.length);
+            resolve (openSquareList[chosenSquare]);
+        }, 500)
+    })
 }
 
 function getSquareClasses(classes) {
@@ -103,22 +117,24 @@ function highlightSquares(squares) {
 }
 
 function updateGame(chosenSquare, squares, turnInformation) {
-    chosenSquare.textContent = currentToken;
-    const squareClasses = getSquareClasses(chosenSquare.className);
-    const classNodeList = squareClasses.map(group => document.querySelectorAll(`.${group}`));
-    const winningSquares = checkWin(classNodeList, currentToken);
-    if (winningSquares){
-        highlightSquares(winningSquares)
-        turnInformation.innerText = (currentToken === player1) ? "Player 1 Wins!" : "Player 2 Wins!";
-        return true;
-    }
-    if (checkDraw(squares)){
-        turnInformation.innerText = "Draw";
-        return true;
-    }
-    currentToken = (currentToken === player1) ? player2 : player1;
-    turnInformation.innerText = updatePlayerTurn(currentToken, player1);
-    return false;
+    return new Promise((resolve) => {
+        chosenSquare.textContent = currentToken;
+        const squareClasses = getSquareClasses(chosenSquare.className);
+        const classNodeList = squareClasses.map(group => document.querySelectorAll(`.${group}`));
+        const winningSquares = checkWin(classNodeList, currentToken);
+        if (winningSquares){
+            highlightSquares(winningSquares)
+            turnInformation.innerText = (currentToken === player1) ? "Player 1 Wins!" : "Player 2 Wins!";
+            resolve (true);
+        }
+        if (checkDraw(squares)){
+            turnInformation.innerText = "Draw";
+            resolve (true);
+        }
+        currentToken = (currentToken === player1) ? player2 : player1;
+        turnInformation.innerText = updatePlayerTurn(currentToken, player1);
+        resolve (false);
+    })
 }
 
 
