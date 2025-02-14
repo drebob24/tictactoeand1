@@ -16,6 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById("reset-button").addEventListener('click', handleReset);
 
+    const board = document.querySelector('.gameboard-container');
+    board.addEventListener('click', async (event) => {
+        const updateStatus = await handleBoardClick(event);
+        if (updateStatus) turnInformation.innerText = updateStatus;
+    });
+})
+
     // Old implementation (used functions have been modified)
     // squares.forEach(square => {
     //     square.addEventListener('click', async function() {
@@ -48,12 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     //     })
     // })
-    const board = document.querySelector('.gameboard-container');
-    board.addEventListener('click', async (event) => {
-        const updateStatus = await handleBoardClick(event);
-        if (updateStatus) turnInformation.innerText = updateStatus;
-    });
-})
 
 async function handleBoardClick(event) {
     if (!playersTurn) {
@@ -63,9 +64,8 @@ async function handleBoardClick(event) {
 
     const currentBoard = event.currentTarget;
     const gameElement = currentBoard.closest('.game');
-    const gameOver = gameElement.classList.contains('gameover')
 
-    if (gameOver){
+    if (gameElement.classList.contains('gameover')){
         return false;
     }
 
@@ -95,7 +95,7 @@ async function handleBoardClick(event) {
 
     currentToken = (currentToken === player1) ? player2 : player1;
 
-    if (cpuMode && !gameOver) {
+    if (cpuMode) {
         playersTurn = false;
 
         await pause(500);
