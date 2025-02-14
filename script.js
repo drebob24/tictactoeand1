@@ -2,21 +2,18 @@ const player1 = 'X';
 const player2 = 'O';
 let currentToken = player1;
 let cpuMode = false;
-let gameOver = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     const turnInformation = document.getElementById("sub-heading");
-    var body = document.querySelector('body');
-    var resetButton = document.createElement('button');
-    resetButton.textContent = 'Reset';
-    resetButton.id = 'reset-button';
-    var modeForm = document.getElementById('mode-selection');
+    const modeForm = document.getElementById('mode-selection');
 
     turnInformation.innerText = updatePlayerTurn(currentToken, player1);
 
     modeForm.addEventListener('change', (event) => {
         cpuMode = (event.target.value === "players") ? false : true;
     })
+
+    document.getElementById("reset-button").addEventListener('click', handleReset);
 
     // squares.forEach(square => {
     //     square.addEventListener('click', async function() {
@@ -57,11 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 async function handleBoardClick(event) {
+    const currentBoard = event.currentTarget;
+    const gameElement = currentBoard.closest('.game');
+    const gameOver = gameElement.classList.contains('gameover')
+
     if (gameOver){
         return false;
     }
-
-    const currentBoard = event.currentTarget;
 
     const chosenSquare = event.target.closest('.board-square');
     if (!chosenSquare) return false;
@@ -73,17 +72,17 @@ async function handleBoardClick(event) {
 
     chosenSquare.innerText = currentToken;
 
-    const playerWins = getWinningSquares(currentBoard, chosenSquare);
-    const winningSquaresPlayer = checkWin(playerWins, currentToken);
+    const playerWins = getSquareGroups(currentBoard, chosenSquare);
+    const winningSquaresPlayer = getWinningSquares(playerWins, currentToken);
     if (winningSquaresPlayer){
         highlightSquares(winningSquaresPlayer)
-        gameOver = true;
+        gameElement.classList.add('gameover');
         return (currentToken === player1) ? "Player 1 Wins!" : "Player 2 Wins!";
     }
 
     const emptySquares = currentBoard.querySelectorAll('.board-square:empty');
     if (!emptySquares.length){
-        gameOver = true;
+        gameElement.classList.add('gameover');
         return "Draw";
     }
 
@@ -92,15 +91,15 @@ async function handleBoardClick(event) {
     if (cpuMode && !gameOver) {
         const cpuSquare = await pickSquare(emptySquares);
         cpuSquare.innerText = currentToken;
-        const cpuWins = getWinningSquares(currentBoard, chosenSquare);
-        const winningSquaresCPU = checkWin(cpuWins, currentToken);
+        const cpuWins = getSquareGroups(currentBoard, chosenSquare);
+        const winningSquaresCPU = getWinningSquares(cpuWins, currentToken);
         if (winningSquaresCPU){
             highlightSquares(winningSquaresCPU)
-            gameOver = true;
+            gameElement.classList.add('gameover');
             return (currentToken === player1) ? "Player 1 Wins!" : "Player 2 Wins!";
         }
         if (!emptySquares.length){
-            gameOver = true;
+            gameElement.classList.add('gameover');
             return "Draw";
         }
         currentToken = (currentToken === player1) ? player2 : player1;
@@ -108,6 +107,19 @@ async function handleBoardClick(event) {
 
     return updatePlayerTurn(currentToken, player1);
 }
+
+function handleReset(event) {
+    const gameElement = event.target.closest('.game');
+    gameElement.classList.remove('gameover');
+    const gameboard = gameElement.querySelectorAll('.board-square');
+    gameboard.forEach(square => {
+        square.innerText = '';
+        const offColor = square.classList.contains("offcolor");
+        square.style.backgroundColor = offColor ? "rgb(233, 233, 233)" : "white";
+    })
+    gameElement.querySelector('#sub-heading').innerText = "Player 1's Turn";
+}
+
 
 function pickSquare(emptySquares) {
     return new Promise((resolve) => {
@@ -118,20 +130,20 @@ function pickSquare(emptySquares) {
     })
 }
 
-function getWinningSquares(gameboard, chosenSquare) {
+function getSquareGroups(gameboard, chosenSquare) {
+    const filterList = ['row1', 'row2', 'row3', 'row4',
+        'col1', 'col2', 'col3', 'col4',
+        'diag1', 'diag2'
+    ];
     const squareClasses = chosenSquare.className
         .split(" ")
         .filter(squareClass => {
-            filterList = ['row1', 'row2', 'row3', 'row4',
-                'col1', 'col2', 'col3', 'col4',
-                'diag1', 'diag2'
-            ];
             return filterList.includes(squareClass);
         });
-    return classNodeList = squareClasses.map(group => gameboard.querySelectorAll(`.${group}`));
+        return classNodeList = squareClasses.map(group => gameboard.querySelectorAll(`.${group}`));
 }
 
-function checkWin(nodeList, token) {
+function getWinningSquares(nodeList, token) {
     for (let node of nodeList) {
         const allMatch = Array.from(node)
         .every(square => (square.textContent === token) ? true : false);
@@ -162,14 +174,6 @@ function updatePlayerTurn(currentToken, player1){
 
 
 /////////////////////////////////////////////////////////////////////////
-
-function resetBoard(squares) {
-    squares.forEach(square => {
-        square.innerText = '';
-        const offColor = square.classList.contains("offcolor");
-        square.style.backgroundColor = offColor ? "rgb(233, 233, 233)" : "white";
-    })
-}
 
 function updateGame(chosenSquare, squares, turnInformation) {
     return new Promise((resolve) => {

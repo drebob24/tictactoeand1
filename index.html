@@ -8,40 +8,42 @@
 </head>
 <body>
     <h1 id="header">Tic Tac Toe + 1 Mo'!</h1>
-    <h2 id="sub-heading"></h2>
-    <div class="gameboard-container">
-        <div class="board-row">
-            <div class="board-square row1 col1 diag1 offcolor"></div>
-            <div class="board-square row1 col2"></div>
-            <div class="board-square row1 col3 offcolor"></div>
-            <div class="board-square row1 col4 diag2"></div>
+    <div class="game">
+        <h2 id="sub-heading"></h2>
+        <div class="gameboard-container">
+            <div class="board-row">
+                <div class="board-square row1 col1 diag1 offcolor"></div>
+                <div class="board-square row1 col2"></div>
+                <div class="board-square row1 col3 offcolor"></div>
+                <div class="board-square row1 col4 diag2"></div>
+            </div>
+            <div class="board-row">
+                <div class="board-square row2 col1"></div>
+                <div class="board-square row2 col2 diag1 offcolor"></div>
+                <div class="board-square row2 col3 diag2"></div>
+                <div class="board-square row2 col4 offcolor"></div>
+            </div>
+            <div class="board-row">
+                <div class="board-square row3 col1 offcolor"></div>
+                <div class="board-square row3 col2 diag2"></div>
+                <div class="board-square row3 col3 diag1 offcolor"></div>
+                <div class="board-square row3 col4"></div>
+            </div>
+            <div class="board-row">
+                <div class="board-square row4 col1 diag2"></div>
+                <div class="board-square row4 col2 offcolor"></div>
+                <div class="board-square row4 col3"></div>
+                <div class="board-square row4 col4 diag1 offcolor"></div>
+            </div>
         </div>
-        <div class="board-row">
-            <div class="board-square row2 col1"></div>
-            <div class="board-square row2 col2 diag1 offcolor"></div>
-            <div class="board-square row2 col3 diag2"></div>
-            <div class="board-square row2 col4 offcolor"></div>
-        </div>
-        <div class="board-row">
-            <div class="board-square row3 col1 offcolor"></div>
-            <div class="board-square row3 col2 diag2"></div>
-            <div class="board-square row3 col3 diag1 offcolor"></div>
-            <div class="board-square row3 col4"></div>
-        </div>
-        <div class="board-row">
-            <div class="board-square row4 col1 diag2"></div>
-            <div class="board-square row4 col2 offcolor"></div>
-            <div class="board-square row4 col3"></div>
-            <div class="board-square row4 col4 diag1 offcolor"></div>
-        </div>
+        <form id="mode-selection">
+            <input type="radio" id="players-mode" name="mode" checked="checked" value="players">
+            <label for="players-mode">2 Players</label>
+            <input type="radio" name="mode" id="cpu-mode" value="cpu">
+            <label for="cpu-mode">CPU</label>
+        </form>
+        <button id="reset-button" class="reset">Reset Board</button>
     </div>
-    <button id="reset-button" class="gameover">Reset Board</button>
-    <form id="mode-selection">
-        <input type="radio" id="players-mode" name="mode" checked="checked" value="players">
-        <label for="players-mode">2 Players</label>
-        <input type="radio" name="mode" id="cpu-mode" value="cpu">
-        <label for="cpu-mode">CPU</label>
-    </form>
     <script src="./script.js"></script>
 </body>
 </html>

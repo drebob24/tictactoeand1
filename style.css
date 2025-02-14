@@ -34,3 +34,16 @@ body {
 .offcolor {
     background-color: rgb(233, 233, 233);
 }
+
+.game.gameover .board-square {
+    cursor: not-allowed;
+}
+
+.game .reset{
+    display: none;
+    margin: 16px auto;
+}
+
+.game.gameover .reset{
+    display: block
+}
