@@ -62,7 +62,6 @@ async function handleBoardClick(event) {
     }
 
     const currentBoard = event.currentTarget;
-    const squares = currentBoard.querySelectorAll(".board-square");
 
     const chosenSquare = event.target.closest('.board-square');
     if (!chosenSquare) return false;
@@ -81,7 +80,9 @@ async function handleBoardClick(event) {
         gameOver = true;
         return (currentToken === player1) ? "Player 1 Wins!" : "Player 2 Wins!";
     }
-    if (checkDraw(squares)){
+
+    const emptySquares = currentBoard.querySelectorAll('.board-square:empty');
+    if (!emptySquares.length){
         gameOver = true;
         return "Draw";
     }
@@ -89,7 +90,7 @@ async function handleBoardClick(event) {
     currentToken = (currentToken === player1) ? player2 : player1;
 
     if (cpuMode && !gameOver) {
-        const cpuSquare = await pickSquare(squares);
+        const cpuSquare = await pickSquare(emptySquares);
         cpuSquare.innerText = currentToken;
         const cpuWins = getWinningSquares(currentBoard, chosenSquare);
         const winningSquaresCPU = checkWin(cpuWins, currentToken);
@@ -98,7 +99,7 @@ async function handleBoardClick(event) {
             gameOver = true;
             return (currentToken === player1) ? "Player 1 Wins!" : "Player 2 Wins!";
         }
-        if (checkDraw(squares)){
+        if (!emptySquares.length){
             gameOver = true;
             return "Draw";
         }
@@ -108,23 +109,25 @@ async function handleBoardClick(event) {
     return updatePlayerTurn(currentToken, player1);
 }
 
-function pickSquare(squares) {
+function pickSquare(emptySquares) {
     return new Promise((resolve) => {
-        const openSquareList = Array.from(squares)
-            .filter(square => !square.textContent);
         setTimeout(() => {
-            const chosenSquare = Math.floor(Math.random() * openSquareList.length);
-            resolve (openSquareList[chosenSquare]);
+            const chosenSquare = Math.floor(Math.random() * emptySquares.length);
+            resolve (emptySquares[chosenSquare]);
         }, 500)
     })
 }
 
 function getWinningSquares(gameboard, chosenSquare) {
     const squareClasses = chosenSquare.className
-        .replace("board-square", "")
-        .replace("offcolor", "")
-        .trim()
-        .split(" ");
+        .split(" ")
+        .filter(squareClass => {
+            filterList = ['row1', 'row2', 'row3', 'row4',
+                'col1', 'col2', 'col3', 'col4',
+                'diag1', 'diag2'
+            ];
+            return filterList.includes(squareClass);
+        });
     return classNodeList = squareClasses.map(group => gameboard.querySelectorAll(`.${group}`));
 }
 
@@ -143,12 +146,6 @@ function highlightSquares(squares) {
     squares.forEach(square => {
         square.style.backgroundColor = 'gold';
     })
-}
-
-function checkDraw(allSquares) {
-    const allFilled = Array.from(allSquares)
-        .every(square => (square.textContent !== '')) ? true : false;
-    return allFilled
 }
 
 function updatePlayerTurn(currentToken, player1){
