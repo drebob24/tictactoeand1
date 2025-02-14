@@ -4,3 +4,5 @@ Practice of:
 HTML
 CSS
 Javascript
+
+Initial implementation by self. Rework with assistance from Turing documentation.

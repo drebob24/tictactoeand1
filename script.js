@@ -152,7 +152,7 @@ function getSquareGroups(gameboard, chosenSquare) {
         .filter(squareClass => {
             return filterList.includes(squareClass);
         });
-        return classNodeList = squareClasses.map(group => gameboard.querySelectorAll(`.${group}`));
+    return classNodeList = squareClasses.map(group => gameboard.querySelectorAll(`.${group}`));
 }
 
 function getWinningSquares(nodeList, token) {
@@ -177,8 +177,6 @@ function updatePlayerTurn(currentToken, player1){
     ? `Player 1's Turn`
     : `Player 2's Turn`;
 }
-
-
 
 function pause(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms))
@@ -209,17 +207,3 @@ function pause(ms) {
 //         resolve (false);
 //     })
 // }
-
-
-
-// Wait for click
-
-// Confirm Space Open
-
-// Check for Win
-
-// Computer Plays
-
-// Check for Win
-
-// Repeat
